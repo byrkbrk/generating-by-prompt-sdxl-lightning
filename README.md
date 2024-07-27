@@ -1,1 +1,1 @@
-# Generating by Prompts using Stable Diffusion-Lightning
+# Generating by Prompts using Stable Diffusion-Lightning
