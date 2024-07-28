@@ -23,9 +23,21 @@ class StableDiffusion(object):
         """Returns generated image for given text prompt"""
         pass
 
-    def instantiate_pipeline(self):
+    def instantiate_pipeline(self, base, repo, checkpoint, device, scheduler_name):
         """Returns instantiated pipeline"""
-        pass
+        pipeline = StableDiffusionXLPipeline.from_pretrained(
+            base,
+            unet=self._instantiate_unet(base, repo, checkpoint, device),
+            torch_dtype=torch.float16,
+            variant="fp16").to(device)
+        self._set_scheduler(pipeline, scheduler_name)
+        return pipeline
+
+    def _instantiate_unet(self, base, repo, checkpoint, device):
+        """Returns instantiated UNet"""
+        unet = UNet2DConditionModel.from_config(base, subfolder="unet").to(device, torch.float16)
+        unet.load_state_dict(load_file(hf_hub_download(repo, checkpoint)), device=device)
+        return unet
 
     def _set_scheduler(self, pipeline, scheduler_name):
         """Sets the scheduler of the pipeline for given scheduler name"""
