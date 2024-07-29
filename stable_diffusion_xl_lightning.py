@@ -93,9 +93,11 @@ class StableDiffusion(object):
     def initialize_checkpoint_name(self, step_choice):
         """Returns checkpoint name based on step choice"""
         n_steps = self.initialize_num_inference_steps(step_choice)
+        if n_steps == 1:
+            return f"sdxl_lightning_{n_steps}step_unet_x0.safetensors"
         return f"sdxl_lightning_{n_steps}step_unet.safetensors"
 
 
 if __name__ == "__main__":
     prompt = ["an image of a turtle in Picasso style"]
-    StableDiffusion(step_choice="8-step").generate(prompt)
+    StableDiffusion(step_choice="1-step").generate(prompt)
