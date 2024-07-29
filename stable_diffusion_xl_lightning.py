@@ -11,20 +11,23 @@ class StableDiffusion(object):
                  base: str="stabilityai/stable-diffusion-xl-base-1.0",
                  repo: str="ByteDance/SDXL-Lightning",
                  step_choice: str="2-step",
-                 ckpt: str="sdxl_lightning_2step_unet.safetensors",
+                 #ckpt: str="sdxl_lightning_2step_unet.safetensors",
                  scheduler_name: str="euler_discrete_scheduler",
                  device: str=None,
                  create_dirs: bool=True
                  ):
         self.step_choice = step_choice
+        self.num_inference_steps = self.initialize_num_inference_steps(step_choice)
         self.module_dir = os.path.dirname(__file__)
         self.device = self.initialize_device(device)
-        self.pipeline = self.instantiate_pipeline(base, repo, ckpt, scheduler_name, self.device)
+        self.pipeline = self.instantiate_pipeline(base, repo, self.initialize_checkpoint_name(step_choice), scheduler_name, self.device)
         if create_dirs: self.create_dirs(self.module_dir)
         
     def generate(self, prompt, show=True, save=True):
         """Returns generated image for given text prompt"""
-        images = self.pipeline(prompt, num_inference_steps=2, guidance_scale=0).images
+        images = self.pipeline(prompt, 
+                               num_inference_steps=self.num_inference_steps, 
+                               guidance_scale=0).images
         for i, image in enumerate(images):
             if save: 
                 image.save(os.path.join(self.module_dir, "generated-images", f"generated_image_{i}.jpg"))
@@ -87,7 +90,12 @@ class StableDiffusion(object):
         else:
             raise ValueError(f"Unexpected step choice: {step_choice}")
 
+    def initialize_checkpoint_name(self, step_choice):
+        """Returns checkpoint name based on step choice"""
+        n_steps = self.initialize_num_inference_steps(step_choice)
+        return f"sdxl_lightning_{n_steps}step_unet.safetensors"
+
 
 if __name__ == "__main__":
     prompt = ["an image of a turtle in Picasso style"]
-    StableDiffusion().generate(prompt)
+    StableDiffusion(step_choice="8-step").generate(prompt)
