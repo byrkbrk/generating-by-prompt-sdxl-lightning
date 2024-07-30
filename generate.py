@@ -14,7 +14,6 @@ def parse_arguments():
                         type=str, 
                         default="4-step", 
                         choices=["1-step", "2-step", "4-step", "8-step"],
-                        required=False,
                         help="Step choice for inference. Default: '4-step'")
     parser.add_argument("--scheduler_name",
                         type=str,
