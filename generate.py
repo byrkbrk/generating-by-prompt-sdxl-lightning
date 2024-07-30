@@ -30,4 +30,5 @@ def parse_arguments():
 if __name__ == "__main__":
     args = parse_arguments()
     StableDiffusion(step_choice=args.step_choice,
-                    scheduler_name=args.scheduler_name).generate(args.prompt)
+                    scheduler_name=args.scheduler_name,
+                    device=args.device).generate(args.prompt)
