@@ -17,10 +17,11 @@ class StableDiffusion(object):
                  create_dirs: bool=True
                  ):
         self.step_choice = step_choice
-        self.num_inference_steps = self.initialize_num_inference_steps(step_choice)
+        self.num_inference_steps = self.get_num_inference_steps(step_choice)
+        self.checkpoint_name = self.get_checkpoint_name(step_choice)
         self.module_dir = os.path.dirname(__file__)
         self.device = self.initialize_device(device)
-        self.pipeline = self.instantiate_pipeline(base, repo, self.initialize_checkpoint_name(step_choice), scheduler_name, self.device)
+        self.pipeline = self.instantiate_pipeline(base, repo, self.checkpoint_name, scheduler_name, self.device)
         if create_dirs: self.create_dirs(self.module_dir)
         
     def generate(self, prompt, show=True, save=True):
@@ -77,20 +78,14 @@ class StableDiffusion(object):
         for dir_name in dir_names:
             os.makedirs(os.path.join(root, dir_name), exist_ok=True)
     
-    def initialize_num_inference_steps(self, step_choice):
+    def get_num_inference_steps(self, step_choice):
         """Returns number of inference steps based on step choice"""
-        if step_choice == "1-step":
-            return 1
-        elif step_choice == "2-step":
-            return 2
-        elif step_choice == "4-step":
-            return 4
-        elif step_choice == "8-step":
-            return 8
+        if step_choice in {"1-step", "2-step", "4-step", "8-step"}:
+            return int(step_choice[0])
         else:
             raise ValueError(f"Unexpected step choice: {step_choice}")
 
-    def initialize_checkpoint_name(self, step_choice):
+    def get_checkpoint_name(self, step_choice):
         """Returns checkpoint name based on step choice"""
         n_steps = self.initialize_num_inference_steps(step_choice)
         if n_steps == 1:
