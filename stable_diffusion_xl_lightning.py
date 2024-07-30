@@ -87,7 +87,7 @@ class StableDiffusion(object):
 
     def get_checkpoint_name(self, step_choice):
         """Returns checkpoint name based on step choice"""
-        n_steps = self.initialize_num_inference_steps(step_choice)
+        n_steps = self.get_num_inference_steps(step_choice)
         if n_steps == 1:
             return f"sdxl_lightning_{n_steps}step_unet_x0.safetensors"
         return f"sdxl_lightning_{n_steps}step_unet.safetensors"
