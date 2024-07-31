@@ -55,13 +55,6 @@ class StableDiffusion(object):
         self._update_pipeline(pipeline, step_choice)
         return pipeline
 
-    def _instantiate_unet(self, base, repo, checkpoint, device):
-        """Returns instantiated UNet"""
-        unet = UNet2DConditionModel.from_config(base, subfolder="unet").to(device, torch.float16)
-        unet.load_state_dict(load_file(hf_hub_download(repo, checkpoint), 
-                                       device=device.type))
-        return unet
-
     def _set_scheduler(self, pipeline, scheduler_name):
         """Sets the scheduler of the pipeline for given scheduler name"""
         if scheduler_name == "euler_discrete_scheduler":
