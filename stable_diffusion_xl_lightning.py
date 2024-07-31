@@ -45,21 +45,22 @@ class StableDiffusion(object):
                 image.show()
         return images
 
-    def instantiate_pipeline(self, step_choice):
+    def instantiate_pipeline(self, step_choice, scheduler_name="euler_discrete_scheduler"):
         """Returns instantiated pipeline"""
         pipeline = StableDiffusionXLPipeline.from_pretrained(
             StableDiffusion.base,
             torch_dtype=torch.float16,
             variant="fp16").to(self.device)
-        self._set_scheduler(pipeline, self.scheduler_name)
-        self._update_pipeline(pipeline, step_choice)
+        self._update_pipeline(pipeline, step_choice, scheduler_name)
         return pipeline
 
-    def _set_scheduler(self, pipeline, scheduler_name):
+    def _update_scheduler(self, pipeline, step_choice, scheduler_name):
         """Sets the scheduler of the pipeline for given scheduler name"""
         if scheduler_name == "euler_discrete_scheduler":
-            pipeline.scheduler = EulerDiscreteScheduler.from_config(pipeline.scheduler.config,
-                                                                    timestep_spacing="trailing")
+            pipeline.scheduler = EulerDiscreteScheduler.from_config(
+                pipeline.scheduler.config,
+                timestep_spacing="trailing",
+                prediction_type="sample" if self.get_num_inference_steps(step_choice)==1 else "epsilon")
         else:
             raise ValueError(f"Undefined scheduler name: {scheduler_name}")
 
@@ -91,12 +92,16 @@ class StableDiffusion(object):
         """Returns checkpoint name based on step choice"""
         return self.__class__.checkpoints[step_choice][1]
     
-    def _update_pipeline(self, pipeline, step_choice):
+    def _update_pipeline(self, pipeline, step_choice, scheduler_name="euler_discrete_scheduler"):
         """Updates unet in pipeline based on step choice"""
+        self._update_scheduler(pipeline, step_choice, scheduler_name)
+        self._update_unet(pipeline, step_choice)
+    
+    def _update_unet(self, pipeline, step_choice):
         pipeline.unet.load_state_dict(load_file(hf_hub_download(self.__class__.repo, 
                                                                 self.get_checkpoint_name(step_choice)),
                                                 device=self.device.type))
-    
+
     def _is_step_choice_changed(self, step_choice):
         """Returns True if step choice changed"""
         return self.step_choice != step_choice
