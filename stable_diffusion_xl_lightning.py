@@ -101,7 +101,8 @@ class StableDiffusion(object):
         self.pipeline = self.instantiate_pipeline(base=self.base,
                                                   repo=self.repo,
                                                   checkpoint=self.get_checkpoint_name(step_choice),
-                                                  scheduler_name=self.scheduler_name)
+                                                  scheduler_name=self.scheduler_name,
+                                                  device=self.device)
 
 
 if __name__ == "__main__":
