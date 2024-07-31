@@ -98,11 +98,10 @@ class StableDiffusion(object):
     
     def _update_pipeline(self, step_choice):
         """Updates pipeline attribute based on step choice"""
-        self.pipeline = self.instantiate_pipeline(base=self.base,
-                                                  repo=self.repo,
-                                                  checkpoint=self.get_checkpoint_name(step_choice),
-                                                  scheduler_name=self.scheduler_name,
-                                                  device=self.device)
+        self.pipeline.unet.load_state_dict(load_file(hf_hub_download(self.repo, 
+                                                                     self.get_checkpoint_name(step_choice)),
+                                                     device=self.device.type))
+    
 
 
 if __name__ == "__main__":
