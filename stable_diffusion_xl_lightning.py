@@ -7,21 +7,26 @@ from safetensors.torch import load_file
 
 
 class StableDiffusion(object):
+    base = "stabilityai/stable-diffusion-xl-base-1.0"
+    repo = "ByteDance/SDXL-Lightning"
+    checkpoints = {
+        "1-step": [1, "sdxl_lightning_1step_unet_x0.safetensors"],
+        "2-step": [2, "sdxl_lightning_2step_unet.safetensors"],
+        "4-step": [4, "sdxl_lightning_4step_unet.safetensors"],
+        "8-step": [8, "sdxl_lightning_8step_unet.safetensors"]
+    }
+    
     def __init__(self,
-                 base: str="stabilityai/stable-diffusion-xl-base-1.0",
-                 repo: str="ByteDance/SDXL-Lightning",
                  step_choice: str="2-step",
                  scheduler_name: str="euler_discrete_scheduler",
                  device: str=None,
                  create_dirs: bool=True
                  ):
-        self.base = base
-        self.repo = repo
         self.step_choice = step_choice
         self.scheduler_name = scheduler_name
         self.module_dir = os.path.dirname(__file__)
         self.device = self.initialize_device(device)
-        self.pipeline = self.instantiate_pipeline(base, repo, self.get_checkpoint_name(step_choice), scheduler_name, self.device)
+        self.pipeline = self.instantiate_pipeline(step_choice)
         if create_dirs: self.create_dirs(self.module_dir)
         
     def generate(self, prompt, step_choice, show=True, save=True):
@@ -40,14 +45,14 @@ class StableDiffusion(object):
                 image.show()
         return images
 
-    def instantiate_pipeline(self, base, repo, checkpoint, scheduler_name, device):
+    def instantiate_pipeline(self, step_choice):
         """Returns instantiated pipeline"""
         pipeline = StableDiffusionXLPipeline.from_pretrained(
-            base,
-            unet=self._instantiate_unet(base, repo, checkpoint, device),
+            StableDiffusion.base,
             torch_dtype=torch.float16,
-            variant="fp16").to(device)
-        self._set_scheduler(pipeline, scheduler_name)
+            variant="fp16").to(self.device)
+        self._set_scheduler(pipeline, self.scheduler_name)
+        self._update_pipeline(pipeline, step_choice)
         return pipeline
 
     def _instantiate_unet(self, base, repo, checkpoint, device):
@@ -85,22 +90,19 @@ class StableDiffusion(object):
     def get_num_inference_steps(self, step_choice):
         """Returns number of inference steps based on step choice"""
         if step_choice in {"1-step", "2-step", "4-step", "8-step"}:
-            return int(step_choice[0])
+            return self.__class__.checkpoints[step_choice][0]
         else:
             raise ValueError(f"Unexpected step choice: {step_choice}")
 
     def get_checkpoint_name(self, step_choice):
         """Returns checkpoint name based on step choice"""
-        n_steps = self.get_num_inference_steps(step_choice)
-        if n_steps == 1:
-            return f"sdxl_lightning_{n_steps}step_unet_x0.safetensors"
-        return f"sdxl_lightning_{n_steps}step_unet.safetensors"
+        return self.__class__.checkpoints[step_choice][1]
     
-    def _update_pipeline(self, step_choice):
-        """Updates pipeline attribute based on step choice"""
-        self.pipeline.unet.load_state_dict(load_file(hf_hub_download(self.repo, 
-                                                                     self.get_checkpoint_name(step_choice)),
-                                                     device=self.device.type))
+    def _update_pipeline(self, pipeline, step_choice):
+        """Updates unet in pipeline based on step choice"""
+        pipeline.unet.load_state_dict(load_file(hf_hub_download(self.__class__.repo, 
+                                                                self.get_checkpoint_name(step_choice)),
+                                                device=self.device.type))
     
 
 
