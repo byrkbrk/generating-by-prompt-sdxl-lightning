@@ -31,13 +31,13 @@ class StableDiffusion(object):
         
     def generate(self, prompt, step_choice, show=True, save=True):
         """Returns generated image for given text prompt"""
-        if step_choice != self.step_choice:
+        if self._is_step_choice_changed(step_choice):
             self._update_pipeline(step_choice)
-            self.step_choice = step_choice
+            self._update_step_choice(step_choice)
+
         images = self.pipeline(prompt, 
                                num_inference_steps=self.get_num_inference_steps(step_choice), 
-                               guidance_scale=0
-                               ).images
+                               guidance_scale=0).images
         for i, image in enumerate(images):
             if save: 
                 image.save(os.path.join(self.module_dir, "generated-images", f"generated_image_{i}.jpg"))
@@ -96,6 +96,14 @@ class StableDiffusion(object):
         pipeline.unet.load_state_dict(load_file(hf_hub_download(self.__class__.repo, 
                                                                 self.get_checkpoint_name(step_choice)),
                                                 device=self.device.type))
+    
+    def _is_step_choice_changed(self, step_choice):
+        """Returns True if step choice changed"""
+        return self.step_choice != step_choice
+
+    def _update_step_choice(self, step_choice):
+        """Updates step_choice attribute"""
+        self.step_choice = step_choice 
     
 
 
