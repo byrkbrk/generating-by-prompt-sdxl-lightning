@@ -1,6 +1,6 @@
 import os
 import torch
-from diffusers import StableDiffusionXLPipeline, UNet2DConditionModel, EulerDiscreteScheduler
+from diffusers import StableDiffusionXLPipeline, EulerDiscreteScheduler
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
@@ -17,7 +17,7 @@ class StableDiffusion(object):
     }
     
     def __init__(self,
-                 step_choice: str="2-step",
+                 step_choice: str="4-step",
                  scheduler_name: str="euler_discrete_scheduler",
                  device: str=None,
                  create_dirs: bool=True
@@ -32,7 +32,7 @@ class StableDiffusion(object):
     def generate(self, prompt, step_choice, show=True, save=True):
         """Returns generated image for given text prompt"""
         if self._is_step_choice_changed(step_choice):
-            self._update_pipeline(step_choice)
+            self._update_pipeline(self.pipeline, step_choice)
             self._update_step_choice(step_choice)
 
         images = self.pipeline(prompt, 
