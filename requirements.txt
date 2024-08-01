@@ -1,0 +1,6 @@
+pytorch
+diffusers
+accelerate
+transformers
+pillow
+gradio
