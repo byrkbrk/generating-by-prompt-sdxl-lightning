@@ -21,7 +21,7 @@ python3 generate.py --help
 Output:
 
 ~~~
-Generate images by prompts using Stable Diffusion-Ligthning
+Generate images by prompts using SDXL-lightning
 
 positional arguments:
   prompt                Text prompt that be used for generating
@@ -57,3 +57,18 @@ The output images seen below (left: Picasso style, right: Pissarro style) will b
 </p>
 
 ## Generating Images by Gradio
+
+To run the gradio app on your local computer, execute:
+
+~~~
+python3 app.py
+~~~
+Then, visit the url [http://127.0.0.1:7860](http://127.0.0.1:7860) to open the interface.
+
+### Example usage
+
+See the display below for an example usage of the module via Gradio for the prompt `'a painting titled "Lion" in Claude Monet style'` with `inference steps` of 4.
+
+<p align="left">
+  <img src="files-for-readme/generate_by_prompt_sdxl_lightning_gradio.png" width="100%" />
+</p>
