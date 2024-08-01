@@ -28,6 +28,20 @@ We create a module that generates images by user-defined (text) prompts. As a mo
 
 ### Using pip
 
+1. Download & install [Python](https://www.python.org/downloads/) (version==3.11)
+2. Clone the repository:
+    ~~~
+    git clone https://github.com/byrkbrk/generating-by-prompt-sdxl-lightning.git
+    ~~~
+3. Change the directory:
+    ~~~
+    cd generating-by-prompt-sdxl-lightning
+    ~~~
+4. Install packages using `pip`:
+    ~~~
+    pip install -r requirements.txt
+    ~~~
+
 ## Generating Images
 
 Check it out how to use
