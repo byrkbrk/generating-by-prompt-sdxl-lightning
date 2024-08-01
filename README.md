@@ -8,6 +8,24 @@ We create a module that generates images by user-defined (text) prompts. As a mo
 
 ### Using Conda (recommended)
 
+1. Install [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html), if not already installed.
+2. Clone the repository:
+    ~~~
+    git clone https://github.com/byrkbrk/generating-by-prompt-sdxl-lightning.git
+    ~~~
+3. Change the directory:
+    ~~~
+    cd generating-by-prompt-sdxl-lightning
+    ~~~
+4. Create the environment:
+    ~~~
+    conda env create -f generating-by-prompt-sdxl-lightning.yaml
+    ~~~
+5. Activate the environment:
+    ~~~
+    conda activate generating-by-prompt-sdxl-lightning
+    ~~~
+
 ### Using pip
 
 ## Generating Images
