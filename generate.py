@@ -5,7 +5,7 @@ from stable_diffusion_xl_lightning import StableDiffusion
 
 def parse_arguments():
     """Returns parsed arguments"""
-    parser = ArgumentParser(description="Generate images by prompts using Stable Diffusion-Ligthning")
+    parser = ArgumentParser(description="Generate images by prompts using SDXL-lightning")
     parser.add_argument("prompt", 
                         nargs="+", 
                         type=str, 
