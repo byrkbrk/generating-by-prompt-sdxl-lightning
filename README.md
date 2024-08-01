@@ -72,12 +72,12 @@ options:
 
 ~~~
 python3 generate.py\
- "an image of a turtle in Camille Pissaro style"\
+ "an image of a turtle in Picasso style"\
  --step_choice 2-step
 ~~~
 ~~~
 python3 generate.py\
- "an image of a turtle in Picasso style"\
+ "an image of a turtle in Camille Pissarro style"\
  --step_choice 2-step
 ~~~
 
